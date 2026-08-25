@@ -320,6 +320,21 @@ function App() {
               : "Focus on accuracy first. Speed will come naturally."}
           </p>
         </div>
+        {finished && (
+          <div className="results-message">
+            <p className="results-label">
+              FINAL RESULT
+            </p>
+
+            <h2>
+              {wpm} WPM
+            </h2>
+
+            <p>
+              {accuracy}% accuracy · {errors} errors
+            </p>
+          </div>
+        )}
 
       </section>
 
