@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { typingTexts } from "./data/texts";
 
@@ -32,10 +32,13 @@ const getRandomText = (difficulty) => {
 };
 
 function App() {
+  const textareaRef = useRef(null);
   const [input, setInput] = useState("");
   const [sampleText, setSampleText] = useState(
     getRandomText("medium")
+
   );
+
 
   const [selectedTime, setSelectedTime] = useState(30);
   const [time, setTime] = useState(30);
@@ -62,6 +65,8 @@ function App() {
 
     return () => clearInterval(timer);
   }, [started, finished, time]);
+
+
 
   // Start typing
   const handleChange = (event) => {
@@ -103,7 +108,32 @@ function App() {
     setStarted(false);
     setFinished(false);
     setSampleText(getRandomText(difficulty));
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
   };
+
+  useEffect(() => {
+    const handleKeyboard = (event) => {
+      if (event.key === "Escape") {
+        resetGame();
+      }
+
+      if (
+        (event.key === "Enter" || event.key === "Tab") &&
+        finished
+      ) {
+        event.preventDefault();
+        resetGame();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyboard);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyboard);
+    };
+  }, [finished]);
 
   // Correct characters
   const correctCharacters = input
@@ -284,6 +314,7 @@ function App() {
           </div>
 
           <textarea
+            ref={textareaRef}
             value={input}
             onChange={handleChange}
             placeholder={
