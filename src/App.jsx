@@ -19,14 +19,23 @@ const DIFFICULTIES = {
   },
 };
 
-const getRandomText = () => {
-  const randomIndex = Math.floor(Math.random() * typingTexts.length);
-  return typingTexts[randomIndex];
+const getRandomText = (difficulty) => {
+  const filteredTexts = typingTexts.filter(
+    (item) => item.difficulty === difficulty
+  );
+
+  const randomIndex = Math.floor(
+    Math.random() * filteredTexts.length
+  );
+
+  return filteredTexts[randomIndex].text;
 };
 
 function App() {
   const [input, setInput] = useState("");
-  const [sampleText, setSampleText] = useState(getRandomText);
+  const [sampleText, setSampleText] = useState(
+    getRandomText("medium")
+  );
 
   const [selectedTime, setSelectedTime] = useState(30);
   const [time, setTime] = useState(30);
@@ -84,6 +93,7 @@ function App() {
     if (started) return;
 
     setDifficulty(newDifficulty);
+    setSampleText(getRandomText(newDifficulty));
   };
 
   // Restart
@@ -92,7 +102,7 @@ function App() {
     setTime(selectedTime);
     setStarted(false);
     setFinished(false);
-    setSampleText(getRandomText());
+    setSampleText(getRandomText(difficulty));
   };
 
   // Correct characters
