@@ -225,6 +225,16 @@ function App() {
       )
       : 0;
 
+  const progress =
+    sampleText.length > 0
+      ? Math.min(
+        Math.round(
+          (input.length / sampleText.length) * 100
+        ),
+        100
+      )
+      : 0;
+
   // Update personal best
   useEffect(() => {
     if (!finished || wpm <= 0) return;
@@ -411,7 +421,19 @@ function App() {
 
         {/* TYPING CARD */}
         <div className="typing-card">
+          <div className="progress-container">
+            <div className="progress-info">
+              <span>PROGRESS</span>
+              <span>{progress}%</span>
+            </div>
 
+            <div className="progress-track">
+              <div
+                className="progress-bar"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
           {/* SAMPLE TEXT */}
           <div className="text-display">
 
