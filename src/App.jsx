@@ -2,8 +2,22 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { typingTexts } from "./data/texts";
 
+const TIME_OPTIONS = [15, 30, 60];
 
-const GAME_TIME = 30;
+const DIFFICULTIES = {
+  easy: {
+    label: "Easy",
+    description: "Simple words",
+  },
+  medium: {
+    label: "Medium",
+    description: "Normal difficulty",
+  },
+  hard: {
+    label: "Hard",
+    description: "Longer & complex",
+  },
+};
 
 const getRandomText = () => {
   const randomIndex = Math.floor(Math.random() * typingTexts.length);
@@ -13,7 +27,12 @@ const getRandomText = () => {
 function App() {
   const [input, setInput] = useState("");
   const [sampleText, setSampleText] = useState(getRandomText);
-  const [time, setTime] = useState(GAME_TIME);
+
+  const [selectedTime, setSelectedTime] = useState(30);
+  const [time, setTime] = useState(30);
+
+  const [difficulty, setDifficulty] = useState("medium");
+
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
@@ -35,7 +54,7 @@ function App() {
     return () => clearInterval(timer);
   }, [started, finished, time]);
 
-  // Typing handler
+  // Start typing
   const handleChange = (event) => {
     if (finished) return;
 
@@ -47,25 +66,42 @@ function App() {
 
     setInput(value);
 
-    // Finish if the whole sentence is typed
     if (value.length >= sampleText.length) {
       setFinished(true);
     }
   };
 
+  // Change time
+  const handleTimeChange = (newTime) => {
+    if (started) return;
+
+    setSelectedTime(newTime);
+    setTime(newTime);
+  };
+
+  // Change difficulty
+  const handleDifficultyChange = (newDifficulty) => {
+    if (started) return;
+
+    setDifficulty(newDifficulty);
+  };
+
   // Restart
- const resetGame = () => {
-  setInput("");
-  setTime(GAME_TIME);
-  setStarted(false);
-  setFinished(false);
-  setSampleText(getRandomText());
-};
+  const resetGame = () => {
+    setInput("");
+    setTime(selectedTime);
+    setStarted(false);
+    setFinished(false);
+    setSampleText(getRandomText());
+  };
 
   // Correct characters
   const correctCharacters = input
     .split("")
     .filter((char, index) => char === sampleText[index]).length;
+
+  // Errors
+  const errors = input.length - correctCharacters;
 
   // Accuracy
   const accuracy =
@@ -73,11 +109,11 @@ function App() {
       ? Math.round((correctCharacters / input.length) * 100)
       : 100;
 
-  // Words typed
+  // Words
   const words = input.trim() ? input.trim().split(/\s+/).length : 0;
 
   // Time used
-  const timeUsed = GAME_TIME - time;
+  const timeUsed = selectedTime - time;
 
   // WPM
   const wpm =
@@ -87,6 +123,7 @@ function App() {
 
   return (
     <main className="app">
+
       {/* HEADER */}
       <header className="header">
         <div className="logo">
@@ -95,9 +132,9 @@ function App() {
         </div>
 
         <div className="header-info">
-          <span>30 SEC</span>
+          <span>{selectedTime} SEC</span>
           <span>•</span>
-          <span>ENGLISH</span>
+          <span>{difficulty.toUpperCase()}</span>
         </div>
       </header>
 
@@ -116,9 +153,67 @@ function App() {
           <p className="subtitle">
             {finished
               ? "Here's how you performed."
-              : "Type the text below as quickly and accurately as you can."}
+              : "Choose your settings and start typing."}
           </p>
         </div>
+
+        {/* SETTINGS */}
+        {!started && !finished && (
+          <div className="settings">
+
+            <div className="setting-group">
+              <span className="setting-label">
+                DIFFICULTY
+              </span>
+
+              <div className="options">
+                {Object.entries(DIFFICULTIES).map(
+                  ([key, value]) => (
+                    <button
+                      key={key}
+                      className={
+                        difficulty === key
+                          ? "option active"
+                          : "option"
+                      }
+                      onClick={() =>
+                        handleDifficultyChange(key)
+                      }
+                    >
+                      <strong>{value.label}</strong>
+                      <small>{value.description}</small>
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="setting-group">
+              <span className="setting-label">
+                TIME
+              </span>
+
+              <div className="time-options">
+                {TIME_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    className={
+                      selectedTime === option
+                        ? "time-option active"
+                        : "time-option"
+                    }
+                    onClick={() =>
+                      handleTimeChange(option)
+                    }
+                  >
+                    {option}s
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        )}
 
         {/* STATS */}
         <div className="stats">
@@ -138,6 +233,11 @@ function App() {
             <strong>{accuracy}%</strong>
           </div>
 
+          <div className="stat">
+            <span>ERRORS</span>
+            <strong>{errors}</strong>
+          </div>
+
         </div>
 
         {/* TYPING CARD */}
@@ -155,7 +255,10 @@ function App() {
                     : "incorrect";
               }
 
-              if (index === input.length && !finished) {
+              if (
+                index === input.length &&
+                !finished
+              ) {
                 className = "current";
               }
 
@@ -175,7 +278,7 @@ function App() {
             onChange={handleChange}
             placeholder={
               finished
-                ? "Test finished — click Restart to try again."
+                ? "Test finished — click Restart."
                 : "Start typing here..."
             }
             spellCheck="false"
@@ -203,7 +306,7 @@ function App() {
 
           <p>
             {finished
-              ? `You typed ${words} words with ${accuracy}% accuracy.`
+              ? `You typed ${words} words with ${accuracy}% accuracy and made ${errors} errors.`
               : "Focus on accuracy first. Speed will come naturally."}
           </p>
         </div>
