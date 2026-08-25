@@ -47,6 +47,9 @@ function App() {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [countdown, setCountdown] = useState(null);
+  const [bestWpm, setBestWpm] = useState(() => {
+    return Number(localStorage.getItem("typerush-best-wpm")) || 0;
+  });
 
   // =========================
   // TIMER
@@ -205,8 +208,8 @@ function App() {
   const accuracy =
     input.length > 0
       ? Math.round(
-          (correctCharacters / input.length) * 100
-        )
+        (correctCharacters / input.length) * 100
+      )
       : 100;
 
   const words = input.trim()
@@ -218,9 +221,22 @@ function App() {
   const wpm =
     timeUsed > 0
       ? Math.round(
-          words / (timeUsed / 60)
-        )
+        words / (timeUsed / 60)
+      )
       : 0;
+
+  // Update personal best
+  useEffect(() => {
+    if (!finished || wpm <= 0) return;
+
+    if (wpm > bestWpm) {
+      setBestWpm(wpm);
+      localStorage.setItem(
+        "typerush-best-wpm",
+        wpm
+      );
+    }
+  }, [finished, wpm, bestWpm]);
 
   // =========================
   // UI
@@ -386,6 +402,11 @@ function App() {
             <strong>{errors}</strong>
           </div>
 
+          <div className="stat best-stat">
+            <span>BEST</span>
+            <strong>{bestWpm}</strong>
+          </div>
+
         </div>
 
         {/* TYPING CARD */}
@@ -436,10 +457,10 @@ function App() {
               finished
                 ? "Test finished — click Restart."
                 : countdown !== null
-                ? "Get ready..."
-                : !started
-                ? "Click Start Test..."
-                : "Start typing here..."
+                  ? "Get ready..."
+                  : !started
+                    ? "Click Start Test..."
+                    : "Start typing here..."
             }
             spellCheck="false"
             autoFocus

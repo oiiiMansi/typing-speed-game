@@ -506,3 +506,13 @@ footer {
     opacity: 1;
   }
 }
+
+/* PERSONAL BEST */
+
+.best-stat {
+  position: relative;
+}
+
+.best-stat strong {
+  color: #7c5cff;
+}
