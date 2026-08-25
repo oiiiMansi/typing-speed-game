@@ -33,6 +33,7 @@ const getRandomText = (difficulty) => {
 
 function App() {
   const textareaRef = useRef(null);
+  const countdownRef = useRef(null);
 
   const [input, setInput] = useState("");
   const [sampleText, setSampleText] = useState(
@@ -122,11 +123,12 @@ function App() {
 
     let current = 3;
 
-    const countdownTimer = setInterval(() => {
+    countdownRef.current = setInterval(() => {
       current -= 1;
 
       if (current === 0) {
-        clearInterval(countdownTimer);
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
 
         setCountdown(null);
         setStarted(true);
@@ -137,6 +139,14 @@ function App() {
       setCountdown(current);
     }, 1000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
+    };
+  }, []);
 
   // =========================
   // FOCUS AFTER COUNTDOWN
@@ -153,6 +163,11 @@ function App() {
   // =========================
 
   const resetGame = () => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+
     setInput("");
     setTime(selectedTime);
     setStarted(false);

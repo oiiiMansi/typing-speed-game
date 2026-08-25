@@ -547,3 +547,231 @@ footer {
   background: #7c5cff;
   transition: width 0.15s ease;
 }
+
+/* MOBILE POLISH */
+
+@media (max-width: 700px) {
+  .game-title h1 {
+    font-size: 34px;
+    letter-spacing: -1.5px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin: 35px 0 25px;
+  }
+
+  .stat strong {
+    font-size: 20px;
+  }
+
+  .typing-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .text-display {
+    font-size: 15px;
+    line-height: 1.9;
+    min-height: 180px;
+  }
+
+  textarea {
+    height: 120px;
+    font-size: 15px;
+    padding: 14px;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .card-footer button {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .keyboard-hint {
+    flex-direction: column;
+    gap: 6px;
+    line-height: 1.5;
+  }
+
+  .results-message {
+    padding: 25px 18px;
+  }
+
+  .results-message h2 {
+    font-size: 28px;
+  }
+
+  .start-button {
+    width: 100%;
+    margin: 25px auto 0;
+  }
+
+  .countdown {
+    font-size: 52px;
+    margin: 35px 0 15px;
+  }
+
+  footer {
+    height: auto;
+    min-height: 65px;
+    padding: 15px 5%;
+    gap: 10px;
+  }
+}
+
+/* =========================
+   START BUTTON
+========================= */
+
+.start-button {
+  align-self: flex-end;
+  padding: 13px 22px;
+  border: 1px solid #7c5cff;
+  border-radius: 8px;
+  background: #7c5cff;
+  color: #ffffff;
+  font-family: "Space Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  background: #8c70ff;
+  box-shadow: 0 8px 25px rgba(124, 92, 255, 0.25);
+}
+
+.start-button:active {
+  transform: translateY(0);
+}
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 35px auto 15px;
+
+  width: 100px;
+  height: 100px;
+
+  border: 1px solid #7c5cff;
+  border-radius: 50%;
+
+  background: rgba(124, 92, 255, 0.08);
+
+  color: #ffffff;
+
+  font-family: "Space Mono", monospace;
+  font-size: 42px;
+  font-weight: 700;
+
+  box-shadow:
+    0 0 35px rgba(124, 92, 255, 0.15);
+
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.5;
+  }
+}
+
+/* =========================
+   RESULTS
+========================= */
+
+.results-message {
+  margin: 35px auto 0;
+  padding: 30px;
+
+  max-width: 500px;
+
+  text-align: center;
+
+  border: 1px solid #252936;
+  border-radius: 14px;
+
+  background: #0e1016;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.results-label {
+  margin: 0 0 10px;
+
+  color: #7c5cff;
+
+  font-family: "Space Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.results-message h2 {
+  margin: 0;
+
+  font-family: "Space Mono", monospace;
+  font-size: 42px;
+
+  color: #ffffff;
+}
+
+.results-message > p:last-child {
+  margin: 10px 0 0;
+
+  color: #777c89;
+  font-size: 13px;
+}
+
+/* =========================
+   BEST SCORE
+========================= */
+
+.best-stat strong {
+  color: #7c5cff;
+}
+
+/* =========================
+   BUTTON FOCUS
+========================= */
+
+button:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #7c5cff;
+  outline-offset: 3px;
+}
