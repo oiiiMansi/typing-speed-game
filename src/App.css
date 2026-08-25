@@ -453,3 +453,56 @@ footer {
   color: #777c89;
   font-size: 14px;
 }
+
+/* START BUTTON */
+
+.start-button {
+  display: block;
+  margin: 30px auto 0;
+  padding: 14px 30px;
+  border: 1px solid #7c5cff;
+  border-radius: 9px;
+  background: #7c5cff;
+  color: #fff;
+  font-family: "Space Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(124, 92, 255, 0.25);
+}
+
+/* COUNTDOWN */
+
+.countdown {
+  width: 100%;
+  margin: 45px 0 20px;
+  text-align: center;
+  font-family: "Space Mono", monospace;
+  font-size: 64px;
+  font-weight: 700;
+  color: #7c5cff;
+  animation: countdownPulse 1s ease-in-out;
+}
+
+@keyframes countdownPulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

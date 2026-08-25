@@ -33,12 +33,11 @@ const getRandomText = (difficulty) => {
 
 function App() {
   const textareaRef = useRef(null);
+
   const [input, setInput] = useState("");
   const [sampleText, setSampleText] = useState(
     getRandomText("medium")
-
   );
-
 
   const [selectedTime, setSelectedTime] = useState(30);
   const [time, setTime] = useState(30);
@@ -47,8 +46,12 @@ function App() {
 
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [countdown, setCountdown] = useState(null);
 
-  // Timer
+  // =========================
+  // TIMER
+  // =========================
+
   useEffect(() => {
     if (!started || finished || time <= 0) return;
 
@@ -66,59 +69,111 @@ function App() {
     return () => clearInterval(timer);
   }, [started, finished, time]);
 
+  // =========================
+  // TYPING
+  // =========================
 
-
-  // Start typing
   const handleChange = (event) => {
-    if (finished) return;
+    if (finished || countdown !== null) return;
 
     const value = event.target.value;
 
-    if (!started) {
-      setStarted(true);
-    }
-
     setInput(value);
 
+    // Finish when entire text is typed
     if (value.length >= sampleText.length) {
       setFinished(true);
     }
   };
 
-  // Change time
+  // =========================
+  // TIME SELECTION
+  // =========================
+
   const handleTimeChange = (newTime) => {
-    if (started) return;
+    if (started || countdown !== null) return;
 
     setSelectedTime(newTime);
     setTime(newTime);
   };
 
-  // Change difficulty
+  // =========================
+  // DIFFICULTY
+  // =========================
+
   const handleDifficultyChange = (newDifficulty) => {
-    if (started) return;
+    if (started || countdown !== null) return;
 
     setDifficulty(newDifficulty);
     setSampleText(getRandomText(newDifficulty));
   };
 
-  // Restart
+  // =========================
+  // START COUNTDOWN
+  // =========================
+
+  const startGame = () => {
+    if (started || finished || countdown !== null) return;
+
+    setCountdown(3);
+
+    let current = 3;
+
+    const countdownTimer = setInterval(() => {
+      current -= 1;
+
+      if (current === 0) {
+        clearInterval(countdownTimer);
+
+        setCountdown(null);
+        setStarted(true);
+
+        return;
+      }
+
+      setCountdown(current);
+    }, 1000);
+  };
+
+  // =========================
+  // FOCUS AFTER COUNTDOWN
+  // =========================
+
+  useEffect(() => {
+    if (started && !finished) {
+      textareaRef.current?.focus();
+    }
+  }, [started, finished]);
+
+  // =========================
+  // RESTART
+  // =========================
+
   const resetGame = () => {
     setInput("");
     setTime(selectedTime);
     setStarted(false);
     setFinished(false);
+    setCountdown(null);
     setSampleText(getRandomText(difficulty));
+
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 0);
   };
 
+  // =========================
+  // KEYBOARD SHORTCUTS
+  // =========================
+
   useEffect(() => {
     const handleKeyboard = (event) => {
+      // ESC = restart
       if (event.key === "Escape") {
         resetGame();
       }
 
+      // ENTER / TAB = restart after finishing
       if (
         (event.key === "Enter" || event.key === "Tab") &&
         finished
@@ -135,37 +190,48 @@ function App() {
     };
   }, [finished]);
 
-  // Correct characters
+  // =========================
+  // STATS
+  // =========================
+
   const correctCharacters = input
     .split("")
-    .filter((char, index) => char === sampleText[index]).length;
+    .filter(
+      (char, index) => char === sampleText[index]
+    ).length;
 
-  // Errors
   const errors = input.length - correctCharacters;
 
-  // Accuracy
   const accuracy =
     input.length > 0
-      ? Math.round((correctCharacters / input.length) * 100)
+      ? Math.round(
+          (correctCharacters / input.length) * 100
+        )
       : 100;
 
-  // Words
-  const words = input.trim() ? input.trim().split(/\s+/).length : 0;
+  const words = input.trim()
+    ? input.trim().split(/\s+/).length
+    : 0;
 
-  // Time used
   const timeUsed = selectedTime - time;
 
-  // WPM
   const wpm =
     timeUsed > 0
-      ? Math.round(words / (timeUsed / 60))
+      ? Math.round(
+          words / (timeUsed / 60)
+        )
       : 0;
+
+  // =========================
+  // UI
+  // =========================
 
   return (
     <main className="app">
 
       {/* HEADER */}
       <header className="header">
+
         <div className="logo">
           <span className="logo-mark">&gt;_</span>
           <span>TypeRush</span>
@@ -176,13 +242,18 @@ function App() {
           <span>•</span>
           <span>{difficulty.toUpperCase()}</span>
         </div>
+
       </header>
 
       {/* GAME */}
       <section className="game-container">
 
+        {/* TITLE */}
         <div className="game-title">
-          <p className="eyebrow">TYPING SPEED TEST</p>
+
+          <p className="eyebrow">
+            TYPING SPEED TEST
+          </p>
 
           <h1>
             {finished
@@ -195,20 +266,25 @@ function App() {
               ? "Here's how you performed."
               : "Choose your settings and start typing."}
           </p>
+
         </div>
 
         {/* SETTINGS */}
         {!started && !finished && (
           <div className="settings">
 
+            {/* DIFFICULTY */}
             <div className="setting-group">
+
               <span className="setting-label">
                 DIFFICULTY
               </span>
 
               <div className="options">
+
                 {Object.entries(DIFFICULTIES).map(
                   ([key, value]) => (
+
                     <button
                       key={key}
                       className={
@@ -220,21 +296,43 @@ function App() {
                         handleDifficultyChange(key)
                       }
                     >
-                      <strong>{value.label}</strong>
-                      <small>{value.description}</small>
+
+                      <strong>
+                        {value.label}
+                      </strong>
+
+                      <small>
+                        {value.description}
+                      </small>
+
                     </button>
+
                   )
                 )}
+
               </div>
+
             </div>
 
+            {/* START BUTTON */}
+            <button
+              className="start-button"
+              onClick={startGame}
+            >
+              START TEST
+            </button>
+
+            {/* TIME */}
             <div className="setting-group">
+
               <span className="setting-label">
                 TIME
               </span>
 
               <div className="time-options">
+
                 {TIME_OPTIONS.map((option) => (
+
                   <button
                     key={option}
                     className={
@@ -248,10 +346,20 @@ function App() {
                   >
                     {option}s
                   </button>
+
                 ))}
+
               </div>
+
             </div>
 
+          </div>
+        )}
+
+        {/* COUNTDOWN */}
+        {countdown !== null && (
+          <div className="countdown">
+            {countdown}
           </div>
         )}
 
@@ -283,36 +391,43 @@ function App() {
         {/* TYPING CARD */}
         <div className="typing-card">
 
+          {/* SAMPLE TEXT */}
           <div className="text-display">
-            {sampleText.split("").map((char, index) => {
 
-              let className = "";
+            {sampleText.split("").map(
+              (char, index) => {
 
-              if (index < input.length) {
-                className =
-                  input[index] === char
-                    ? "correct"
-                    : "incorrect";
+                let className = "";
+
+                if (index < input.length) {
+                  className =
+                    input[index] === char
+                      ? "correct"
+                      : "incorrect";
+                }
+
+                if (
+                  index === input.length &&
+                  !finished &&
+                  started
+                ) {
+                  className = "current";
+                }
+
+                return (
+                  <span
+                    key={index}
+                    className={className}
+                  >
+                    {char}
+                  </span>
+                );
               }
+            )}
 
-              if (
-                index === input.length &&
-                !finished
-              ) {
-                className = "current";
-              }
-
-              return (
-                <span
-                  key={index}
-                  className={className}
-                >
-                  {char}
-                </span>
-              );
-            })}
           </div>
 
+          {/* INPUT */}
           <textarea
             ref={textareaRef}
             value={input}
@@ -320,13 +435,22 @@ function App() {
             placeholder={
               finished
                 ? "Test finished — click Restart."
+                : countdown !== null
+                ? "Get ready..."
+                : !started
+                ? "Click Start Test..."
                 : "Start typing here..."
             }
             spellCheck="false"
             autoFocus
-            disabled={finished}
+            disabled={
+              finished ||
+              countdown !== null ||
+              !started
+            }
           />
 
+          {/* CARD FOOTER */}
           <div className="card-footer">
 
             <span>
@@ -343,6 +467,7 @@ function App() {
 
         {/* TIP */}
         <div className="keyboard-hint">
+
           <span>TIP</span>
 
           <p>
@@ -350,9 +475,13 @@ function App() {
               ? `You typed ${words} words with ${accuracy}% accuracy and made ${errors} errors.`
               : "Focus on accuracy first. Speed will come naturally."}
           </p>
+
         </div>
+
+        {/* RESULTS */}
         {finished && (
           <div className="results-message">
+
             <p className="results-label">
               FINAL RESULT
             </p>
@@ -364,6 +493,7 @@ function App() {
             <p>
               {accuracy}% accuracy · {errors} errors
             </p>
+
           </div>
         )}
 
@@ -371,8 +501,13 @@ function App() {
 
       {/* FOOTER */}
       <footer>
+
         <span>TypeRush</span>
-        <span>Built with React + Vite</span>
+
+        <span>
+          Built with React + Vite
+        </span>
+
       </footer>
 
     </main>
